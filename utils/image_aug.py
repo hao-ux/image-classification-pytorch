@@ -2,7 +2,7 @@ from PIL import Image, ImageEnhance
 import numpy as np
 
 # ---------------------------------- #
-# Cutout数据增强
+# 1. Cutout数据增强
 # ---------------------------------- #
 class Cutout(object):
     def __init__(self, n_holes=1, length=112, prob=0.5):
@@ -28,7 +28,7 @@ class Cutout(object):
         return img
 
 # ---------------------------------- #
-# 随机图像翻转
+# 2. 随机图像翻转
 # ---------------------------------- #
 class RandomHorizontalVerticalFlip(object):
     def __init__(self, prob0=0.3, prob1=0.4):
@@ -47,7 +47,7 @@ class RandomHorizontalVerticalFlip(object):
         return img
 
 # ---------------------------------- #
-# 调整图片大小
+# 3. 调整图片大小
 # ---------------------------------- #
 class Resize(object):
     def __init__(self, target_size=None):
@@ -61,7 +61,7 @@ class Resize(object):
         return img
     
 # ---------------------------------- #
-# 随机旋转图像
+# 4. 随机旋转图像
 # ---------------------------------- #
 class RandomRotate(object):
     def __init__(self, prob=0.5):
@@ -78,7 +78,7 @@ class RandomRotate(object):
         return img
 
 # ---------------------------------- #
-# 随机亮度调整
+# 5. 随机亮度调整
 # ---------------------------------- #
 class RandomBright(object):
     def __init__(self, prob=0.5, brightness_delta=0.225):
@@ -96,7 +96,7 @@ class RandomBright(object):
         return img
     
 # ---------------------------------- #
-# 随机对比度调整
+# 6. 随机对比度调整
 # ---------------------------------- #
 class RandomContrast(object):
     def __init__(self, prob=0.5, contrast_delta=0.5):
@@ -114,7 +114,7 @@ class RandomContrast(object):
         return img
     
 # ---------------------------------- #
-# 随机饱和度调整
+# 7. 随机饱和度调整
 # ---------------------------------- #
 class RandomSaturation(object):
     def __init__(self, prob=0.5, saturation_delta=0.5):
@@ -132,7 +132,7 @@ class RandomSaturation(object):
         return img
 
 # ---------------------------------- #
-# 随机色度调整
+# 8. 随机色度调整
 # ---------------------------------- #
 class RandomHue(object):
     def __init__(self, prob=0.5, hue_delta=18):
