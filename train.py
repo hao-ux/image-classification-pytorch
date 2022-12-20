@@ -17,12 +17,12 @@ from utils.callbacks import LossHistory
 from nets.mobileone import reparameterize_model
 
 config = {
-    'is_cuda'                  : True,
-    'fp16'                     : True,
-    'classes_path'             : './classes.txt',
-    'input_shape'              : [224, 224],
-    'model_name'               : 'mobileone',
-    'pretrained_weights'       : True,
+    'is_cuda'                  : True,              
+    'fp16'                     : True,              
+    'classes_path'             : './classes.txt',   
+    'input_shape'              : [224, 224],        
+    'model_name'               : 'mobileone',       
+    'pretrained_weights'       : True,             
     'model_path'               : '',
     'batch_size'               : 16,
     'Epochs'                   : 400,
