@@ -288,7 +288,8 @@ class MobileOne(nn.Module):
                  width_multipliers: Optional[List[float]] = None,
                  inference_mode: bool = False,
                  use_se: bool = False,
-                 num_conv_branches: int = 1) -> None:
+                 num_conv_branches: int = 1,
+                 pretrained: bool = False) -> None:
         """ Construct MobileOne model.
 
         :param num_blocks_per_stage: List of number of blocks per stage.
@@ -319,8 +320,13 @@ class MobileOne(nn.Module):
                                        num_se_blocks=int(num_blocks_per_stage[2] // 2) if use_se else 0)
         self.stage4 = self._make_stage(int(512 * width_multipliers[3]), num_blocks_per_stage[3],
                                        num_se_blocks=num_blocks_per_stage[3] if use_se else 0)
+        if pretrained:
+            checkpoint = torch.load('weights/mobileone_s0_unfused.pth.tar')
+            self.load_state_dict(checkpoint, strict=False)
         self.gap = nn.AdaptiveAvgPool2d(output_size=1)
         self.linear = nn.Linear(int(512 * width_multipliers[3]), num_classes)
+        
+        
 
     def _make_stage(self,
                     planes: int,
@@ -366,6 +372,7 @@ class MobileOne(nn.Module):
                                          num_conv_branches=self.num_conv_branches))
             self.in_planes = planes
             self.cur_layer_idx += 1
+            
         return nn.Sequential(*blocks)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -393,7 +400,7 @@ PARAMS = {
 
 
 def mobileone(num_classes: int = 1000, inference_mode: bool = False,
-              variant: str = "s0") -> nn.Module:
+              variant: str = "s0", pretrained: bool = False) -> nn.Module:
     """Get MobileOne model.
 
     :param num_classes: Number of classes in the dataset.
@@ -401,8 +408,10 @@ def mobileone(num_classes: int = 1000, inference_mode: bool = False,
     :param variant: Which type of model to generate.
     :return: MobileOne model. """
     variant_params = PARAMS[variant]
-    return MobileOne(num_classes=num_classes, inference_mode=inference_mode,
+    model = MobileOne(num_classes=num_classes, inference_mode=inference_mode,pretrained=pretrained,
                      **variant_params)
+    
+    return model
 
 
 def reparameterize_model(model: torch.nn.Module) -> nn.Module:

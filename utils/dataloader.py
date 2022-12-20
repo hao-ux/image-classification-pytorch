@@ -6,7 +6,7 @@ from utils.image_aug import Cutout, RandomHorizontalVerticalFlip, Resize, Random
 from utils.utils import cvtColor, preprocess_input
 
 class ClassificationDataset(torch.utils.data.Dataset):
-    def __init__(self, file_list,input_shape,prob=0.8,phase='train'):
+    def __init__(self, file_list,input_shape, prob=0.8, phase='train'):
         self.file_list = file_list
         self.input_shape = input_shape
         self.phase = phase
@@ -21,6 +21,11 @@ class ClassificationDataset(torch.utils.data.Dataset):
         image = cvtColor(image)
         if self.phase == 'train':
             image = self.img_aug(image, self.prob)
+        else:
+            if isinstance(self.input_shape, (list, tuple)):
+                self.input_shape = self.input_shape[0]
+            resize = Resize(self.input_shape)
+            image = resize(image)
         image = np.transpose(preprocess_input(np.array(image).astype(np.float32)), [2, 0, 1])
         y = int(self.file_list[index].split(';')[0])
         return image, y
@@ -39,3 +44,12 @@ class ClassificationDataset(torch.utils.data.Dataset):
         
 
 
+def detection_collate(batch):
+    images = []
+    targets = []
+    for image, y in batch:
+        images.append(image)
+        targets.append(y)
+    images  = torch.from_numpy(np.array(images)).type(torch.FloatTensor)
+    targets = torch.from_numpy(np.array(targets)).type(torch.FloatTensor).long()
+    return images, targets

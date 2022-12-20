@@ -13,7 +13,7 @@ if __name__ == "__main__":
     backbone    = "mobileone"
 
     device  = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model   = get_model_from_name[backbone](num_classes=num_classes, inference_mode=True).to(device)
+    model   = get_model_from_name[backbone](num_classes=num_classes, inference_mode=True, pretrained=True).to(device)
 
     summary(model, (3, input_shape[0], input_shape[1]))
 
