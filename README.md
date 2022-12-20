@@ -17,3 +17,6 @@
 ### 4. 部署
 
 ## 参考
+
+1. https://github.com/bubbliiiing/classification-pytorch
+2. https://github.com/apple/ml-mobileone
