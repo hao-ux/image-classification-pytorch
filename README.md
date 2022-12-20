@@ -1,1 +1,1 @@
-简体中文| [English](README_cn.md)
+README_cn.md
