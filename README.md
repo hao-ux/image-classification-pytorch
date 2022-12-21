@@ -33,7 +33,7 @@
     'input_shape'              : [224, 224],        
     'model_name'               : 'mobileone',
     'pretrained_weights'       : True,              # 是否需要预训练权重
-    'model_path'               : '',
+    'model_path'               : '',                # 整个模型的权重
     'batch_size'               : 16,
     'Epochs'                   : 400,
     'learning_rate'            : 1e-2,
