@@ -95,3 +95,4 @@ This repository only supports onnxruntime deployment for now.
 
 1. https://github.com/bubbliiiing/classification-pytorch
 2. https://github.com/apple/ml-mobileone
+3. https://github.com/huawei-noah/Efficient-AI-Backbones/tree/master/ghostnetv2_pytorch
