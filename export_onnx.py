@@ -10,13 +10,13 @@ from utils.utils import get_classes
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--model_name", type=str, default='mobileone',help='select model',choices=['mobileone']
+        "--model_name", type=str, default='ghostnetv2',help='select model',choices=['mobileone', 'ghostnetv2']
     )
     parser.add_argument(
-        "--model_path", type=str, default="weights/mobileone-16e-s0-flower.pth", help="select model path"
+        "--model_path", type=str, default="weights/ghostnetv2.pth", help="select model path"
     )
     parser.add_argument(
-        "--output_path", type=str, default="weights/mobileone-16e-s0-flower.onnx", help="select export dir"
+        "--output_path", type=str, default="weights/ghostnetv2.onnx", help="select export dir"
     )
     parser.add_argument(
         "--input_shape", type=int, default=224, help="input_shape"
@@ -32,6 +32,9 @@ if __name__ == '__main__':
         model = get_model_from_name[args.model_name](num_classes=num_classes, variant="s0")
         model.load_state_dict(torch.load(args.model_path))
         model = reparameterize_model(model)
+    else:
+        model = get_model_from_name[args.model_name](num_classes=num_classes)
+        model.load_state_dict(torch.load(args.model_path))
     model.eval()
     img= torch.zeros(1, 3, args.input_shape, args.input_shape).to('cpu')
     input_layer_names   = ["images"]

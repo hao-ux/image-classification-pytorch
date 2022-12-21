@@ -9,6 +9,7 @@
 | 模型 | 链接 |
 | - | - |
 | [mobileone](https://github.com/apple/ml-mobileone) | [s0](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s0_unfused.pth.tar)、[s1](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s1_unfused.pth.tar)、[s2](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s2_unfused.pth.tar)、[s3](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s3_unfused.pth.tar)、[s4](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s4_unfused.pth.tar) |
+| [ghostnetv2](https://github.com/huawei-noah/Efficient-AI-Backbones/tree/master/ghostnetv2_pytorch) | 宽度：1.0 |
 
 花朵图像分类数据集
 链接：https://pan.baidu.com/s/1zs9U76OmGAIwbYr91KQxgg

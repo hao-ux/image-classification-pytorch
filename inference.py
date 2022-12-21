@@ -33,6 +33,9 @@ class Infer(object):
                 self.model = get_model_from_name[model_name](num_classes=self.num_classes, variant="s0")
                 self.model.load_state_dict(torch.load(self.model_path, map_location=device))
                 self.model = reparameterize_model(self.model)
+            else:
+                self.model = get_model_from_name[model_name](num_classes=self.num_classes)
+                self.model.load_state_dict(torch.load(self.model_path, map_location=device))
             self.model.eval()
             print(f"Load {self.model_name} sucessfully")
             if self.is_cuda:
@@ -85,7 +88,7 @@ class Infer(object):
 
         
     
-    def get_fps(self, n=50):
+    def get_fps(self, n=100):
         if not self.onnxruntime:
             print("Get fps")
             with torch.no_grad():
@@ -109,19 +112,19 @@ class Infer(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--model_name", type=str, default='mobileone',help='select model',choices=['mobileone']
+        "--model_name", type=str, default='ghostnetv2',help='select model',choices=['mobileone', 'ghostnetv2']
     )
     parser.add_argument(
-        "--model_path", type=str, default="weights/mobileone-16e-s0-flower.pth", help="select model path"
+        "--model_path", type=str, default="weights/ghostnetv2.pth", help="select model path"
     )
     parser.add_argument(
-        "--infer_onnx", type=int, default=0, choices=[1,0]
+        "--infer_onnx", type=int, default=1, choices=[1,0]
     )
     parser.add_argument(
-        "--get_fps", type=int, default=0, choices=[1,0]
+        "--get_fps", type=int, default=1, choices=[1,0]
     )
     parser.add_argument(
-        "--model_onnx", type=str, default='./weights/mobileone-16e-s0-flower.onnx'
+        "--model_onnx", type=str, default='./weights/ghostnetv2.onnx'
     )
 
     args = parser.parse_args()

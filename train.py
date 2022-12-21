@@ -21,7 +21,7 @@ config = {
     'fp16'                     : True,              
     'classes_path'             : './classes.txt',   
     'input_shape'              : [224, 224],        
-    'model_name'               : 'mobileone',
+    'model_name'               : 'ghostnetv2',
     'pretrained_weights'       : True,             
     'model_path'               : '',
     'batch_size'               : 16,
@@ -57,7 +57,10 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     class_names = get_classes(classes_path)
     num_classes = len(class_names)
-    model = get_model_from_name[model_name](num_classes=num_classes, variant="s0", pretrained=pretrained_weights, inference_mode=False)
+    if model_name in ['mobileone']:
+        model = get_model_from_name[model_name](num_classes=num_classes, variant="s0", pretrained=pretrained_weights, inference_mode=False)
+    else:
+        model = get_model_from_name[model_name](num_classes=num_classes, pretrained=pretrained_weights)
     if not pretrained_weights:
         weights_init(model)
     if model_path != "":

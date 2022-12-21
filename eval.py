@@ -25,6 +25,9 @@ class Eval(object):
             self.model = get_model_from_name[model_name](num_classes=self.num_classes, variant="s0")
             self.model.load_state_dict(torch.load(self.model_path, map_location=device))
             self.model = reparameterize_model(self.model)
+        else:
+            self.model = get_model_from_name[model_name](num_classes=self.num_classes)
+            self.model.load_state_dict(torch.load(self.model_path, map_location=device))
         self.model.eval()
         print(f"Load {self.model_name} sucessfully")
         if self.is_cuda:
@@ -46,10 +49,10 @@ class Eval(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--model_name", type=str, default='mobileone',help='select model',choices=['mobileone']
+        "--model_name", type=str, default='ghostnetv2',help='select model',choices=['mobileone', 'ghostnetv2']
     )
     parser.add_argument(
-        "--model_path", type=str, default="weights/mobileone-16e-s0-flower.pth", help="select model path"
+        "--model_path", type=str, default="weights/ghostnetv2.pth", help="select model path"
     )
     parser.add_argument(
         "--output_dir", type=str, default="eval_out", help="select metrics output dir"
