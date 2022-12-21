@@ -289,7 +289,8 @@ class MobileOne(nn.Module):
                  inference_mode: bool = False,
                  use_se: bool = False,
                  num_conv_branches: int = 1,
-                 pretrained: bool = False) -> None:
+                 pretrained: bool = False,
+                 variant: str = "s0") -> None:
         """ Construct MobileOne model.
 
         :param num_blocks_per_stage: List of number of blocks per stage.
@@ -321,7 +322,18 @@ class MobileOne(nn.Module):
         self.stage4 = self._make_stage(int(512 * width_multipliers[3]), num_blocks_per_stage[3],
                                        num_se_blocks=num_blocks_per_stage[3] if use_se else 0)
         if pretrained:
-            checkpoint = torch.load('weights/mobileone_s0_unfused.pth.tar')
+            if variant == "s0":
+                checkpoint = torch.load('weights/mobileone_s0_unfused.pth.tar')
+            elif variant == "s1":
+                checkpoint = torch.load('weights/mobileone_s1_unfused.pth.tar')
+            elif variant == "s2":
+                checkpoint = torch.load('weights/mobileone_s2_unfused.pth.tar')
+            elif variant == "s3":
+                checkpoint = torch.load('weights/mobileone_s3_unfused.pth.tar')
+            elif variant == "s4":
+                checkpoint = torch.load('weights/mobileone_s4_unfused.pth.tar')
+            else:
+                ValueError("There is no model to select")
             self.load_state_dict(checkpoint, strict=False)
         self.gap = nn.AdaptiveAvgPool2d(output_size=1)
         self.linear = nn.Linear(int(512 * width_multipliers[3]), num_classes)
@@ -409,7 +421,7 @@ def mobileone(num_classes: int = 1000, inference_mode: bool = False,
     :return: MobileOne model. """
     variant_params = PARAMS[variant]
     model = MobileOne(num_classes=num_classes, inference_mode=inference_mode,pretrained=pretrained,
-                     **variant_params)
+                     **variant_params, variant=variant)
     
     return model
 

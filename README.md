@@ -10,11 +10,81 @@
 | - | - |
 | [mobileone](https://github.com/apple/ml-mobileone) | [s0](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s0_unfused.pth.tar)、[s1](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s1_unfused.pth.tar)、[s2](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s2_unfused.pth.tar)、[s3](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s3_unfused.pth.tar)、[s4](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s4_unfused.pth.tar) |
 
+1. 数据集文件结构
+    ```txt
+    - data
+        - train            # 训练集
+            - flower0
+            - flower1
+            - ...
+        - test             # 验证集
+            - flower0
+            - flower1
+            - ...
+    ```
+    运行`python process_datasets_path.py`命令，将会生成train_cls.txt和valid_cls.txt，这是训练时所需要的。
+
+2. 训练的参数配置在train.py中
+    ```python
+    config = {
+    'is_cuda'                  : True,         
+    'fp16'                     : True,              # 混合精度训练  
+    'classes_path'             : './classes.txt',   # 种类
+    'input_shape'              : [224, 224],        
+    'model_name'               : 'mobileone',
+    'pretrained_weights'       : True,             
+    'model_path'               : '',
+    'batch_size'               : 16,
+    'Epochs'                   : 400,
+    'learning_rate'            : 1e-2,
+    'optimizer_type'           : 'SGD',
+    'lr_decay_type'            : 'Cosine',
+    'num_worker'               : 4,
+    'save_dir'                 : './logs',  # 保存权重以及损失的文件夹
+    'save_period'              : 10,        # 每隔10Epochs保存一次权重
+    'loss_func'                : 'Poly_loss'# 损失函数
+    }
+    ```
+
+    mobileone网络结构的参数，运行：
+    ```txt
+    python summary.py --backbone mobileone
+    ```
+    单GPU训练，运行：
+    ```txt
+    python train.py
+    ```
+
+
 ### 2. 评估
+
+运行：
+```txt
+python eval.py --model_name mobileone --model_path weights/mobileone-16e-s0-flower.pth --output_dir eval_out
+```
+其中，`model_name`表示要评估的图像分类模型，`model_path`表示权重路径，`output_dir`表示保存评估结果的文件夹。
 
 ### 3. 推理
 
+预测图片运行：
+```txt
+python inference.py --model_name mobileone --model_path weights/mobileone-16e-s0-flower.pth
+```
+
 ### 4. 部署
+
+本仓库暂时只支持onnxruntime部署。
+1. 导出onnx，运行：
+    ```txt
+    python export_onnx.py --model_name mobileone --model_path weights/mobileone-16e-s0-flower.pth --output_path weights/mobileone-16e-s0-flower.onnx
+    ```
+    其中，output_path表示onnx导出的路径。
+
+2. 使用onnxruntime推理图片，运行：
+    ```txt
+    python inference.py --model_name mobileone --model_onnx ./weights/mobileone-16e-s0-flower.onnx --infer_onnx 1
+    ```
+
 
 ## 参考
 

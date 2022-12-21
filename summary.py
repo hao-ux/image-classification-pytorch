@@ -2,18 +2,22 @@
 #   该部分代码只用于看网络结构，并非测试代码
 #--------------------------------------------#
 import torch
+import argparse
 from thop import clever_format, profile
 from torchsummary import summary
 
 from nets import get_model_from_name
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--backbone", type=str, default='mobileone',help='select model',choices=['mobileone']
+    )
+    args = parser.parse_args()
     input_shape = [224, 224]
     num_classes = 1000
-    backbone    = "mobileone"
-
     device  = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model   = get_model_from_name[backbone](num_classes=num_classes, inference_mode=True, pretrained=True).to(device)
+    model   = get_model_from_name[args.backbone](num_classes=num_classes, variant="s0").to(device)
 
     summary(model, (3, input_shape[0], input_shape[1]))
 

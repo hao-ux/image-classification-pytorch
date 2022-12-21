@@ -85,12 +85,9 @@ class Infer(object):
 
         
     
-    def get_fps(self, image, n=50):
+    def get_fps(self, n=50):
         if not self.onnxruntime:
             print("Get fps")
-            image = cvtColor(image)
-            image_data = Resize(self.input_shape)(image)
-            image_data  = np.transpose(np.expand_dims(preprocess_input(np.array(image_data, np.float32)), 0), (0, 3, 1, 2))
             with torch.no_grad():
                 photo   = torch.from_numpy(np.random.randn(1, 3, 224, 224).astype(np.float32))
                 if self.is_cuda:
@@ -102,9 +99,6 @@ class Infer(object):
                 print(f"time: {(end-start)/n}, fps: {n/(end-start)}")
         else:
             print("Get onnx model fps")
-            image = cvtColor(image)
-            image_data = Resize(self.input_shape)(image)
-            image_data  = np.transpose(np.expand_dims(preprocess_input(np.array(image_data, np.float32)), 0), (0, 3, 1, 2))
             start = time.time()
             for _ in range(n):
                 outputs = self.ort_session.run(self.output_names, {input_name: np.random.randn(1, 3, 224, 224).astype(np.float32) for input_name in self.input_names})
@@ -121,25 +115,23 @@ if __name__ == '__main__':
         "--model_path", type=str, default="weights/mobileone-16e-s0-flower.pth", help="select model path"
     )
     parser.add_argument(
-        "--output_dir", type=str, default="eval_out", help="select metrics output dir"
+        "--infer_onnx", type=int, default=0, choices=[1,0]
     )
     parser.add_argument(
-        "--infer_onnx", type=bool, default=True, help="select metrics output dir"
+        "--get_fps", type=int, default=0, choices=[1,0]
     )
     parser.add_argument(
-        "--get_fps", type=bool, default=False, help="select metrics output dir"
-    )
-    parser.add_argument(
-        "--model_onnx", type=str, default='./weights/mobileone-16e-s0-flower.onnx', help="select metrics output dir"
+        "--model_onnx", type=str, default='./weights/mobileone-16e-s0-flower.onnx'
     )
 
     args = parser.parse_args()
     image = Image.open('./img/flower4.jpg')
     infer = Infer(args.model_name, args.model_path, args.infer_onnx, onnx_path=args.model_onnx)
-    class_name = (
-        infer.onnx_detect(image) if args.infer_onnx else infer.detect(image)
-    )
-    print(class_name)
+    if not args.get_fps:
+        class_name = (
+            infer.onnx_detect(image) if args.infer_onnx else infer.detect(image)
+        )
+        print("Prediction:", class_name)
     if args.get_fps:
-        infer.get_fps(image)
+        infer.get_fps()
     

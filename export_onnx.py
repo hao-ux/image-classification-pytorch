@@ -16,7 +16,7 @@ if __name__ == '__main__':
         "--model_path", type=str, default="weights/mobileone-16e-s0-flower.pth", help="select model path"
     )
     parser.add_argument(
-        "--output_dir", type=str, default="weights/mobileone-16e-s0-flower.onnx", help="select export dir"
+        "--output_path", type=str, default="weights/mobileone-16e-s0-flower.onnx", help="select export dir"
     )
     parser.add_argument(
         "--input_shape", type=int, default=224, help="input_shape"
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     print(f'Starting export with onnx {onnx.__version__}.')
     torch.onnx.export(model,
                         img,
-                        f               = args.output_dir,
+                        f               = args.output_path,
                         verbose         = False,
                         opset_version   = 12,
                         training        = torch.onnx.TrainingMode.EVAL,
@@ -47,7 +47,7 @@ if __name__ == '__main__':
                         input_names     = input_layer_names,
                         output_names    = output_layer_names,
                         dynamic_axes    = None)
-    model_onnx = onnx.load(args.output_dir)
+    model_onnx = onnx.load(args.output_path)
     onnx.checker.check_model(model_onnx)
 
     if args.simplify:
@@ -58,9 +58,9 @@ if __name__ == '__main__':
             dynamic_input_shape=False,
             input_shapes=None)
         assert check, 'assert check failed'
-        onnx.save(model_onnx, args.output_dir)
+        onnx.save(model_onnx, args.output_path)
 
-    print(f'Onnx model save as {args.output_dir}')
+    print(f'Onnx model save as {args.output_path}')
     
     
     
