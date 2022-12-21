@@ -16,7 +16,7 @@ def evaluteTop1_5(classfication, lines, metrics_out_path):
         x = Image.open(annotation_path)
         y = int(line.split(';')[0])
 
-        pred        = classfication.detect_image(x)
+        pred        = classfication.detect(x)
         pred_1      = np.argmax(pred)
         correct_1   += pred_1 == y
         
@@ -107,7 +107,7 @@ def evaluteRecall(classfication, lines, metrics_out_path):
         x = Image.open(annotation_path)
         y = int(line.split(';')[0])
 
-        pred = classfication.detect_image(x)
+        pred = classfication.detect(x)
         pred = np.argmax(pred)
 
         preds.append(pred)
