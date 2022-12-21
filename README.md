@@ -36,7 +36,7 @@
     'fp16'                     : True,              # 混合精度训练  
     'classes_path'             : './classes.txt',   # 种类
     'input_shape'              : [224, 224],        
-    'model_name'               : 'mobileone',
+    'model_name'               : 'mobileone',       # ghostnetv2, mobileone
     'pretrained_weights'       : True,              # 是否需要预训练权重
     'model_path'               : '',                # 整个模型的权重
     'batch_size'               : 16,
