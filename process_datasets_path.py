@@ -29,5 +29,6 @@ if __name__ == '__main__':
    
     txt_data(train_data_path, classes_name, mode='train')
     txt_data(train_data_path, classes_name, mode='valid')
+    print("Finished")
     
     

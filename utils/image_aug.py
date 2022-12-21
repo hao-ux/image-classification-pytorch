@@ -53,6 +53,8 @@ class Resize(object):
     def __init__(self, target_size=None):
         super(Resize, self).__init__()
         self.target_size = target_size
+        if isinstance(self.target_size, (list, tuple)):
+            self.target_size = self.target_size[0]
         
     def __call__(self, img):
         if isinstance(img, np.ndarray):

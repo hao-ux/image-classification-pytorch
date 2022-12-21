@@ -57,7 +57,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     class_names = get_classes(classes_path)
     num_classes = len(class_names)
-    model = get_model_from_name[model_name](num_classes=num_classes, variant="s0", pretrained=pretrained_weights)
+    model = get_model_from_name[model_name](num_classes=num_classes, variant="s0", pretrained=pretrained_weights, inference_mode=False)
     if not pretrained_weights:
         weights_init(model)
     if model_path != "":
@@ -193,11 +193,11 @@ if __name__ == '__main__':
         print('Total Loss: %.3f || Val Loss: %.3f ' % (total_loss / epoch_step, val_loss / epoch_step_val))
         
         if (epoch + 1) % save_period == 0 or epoch + 1 == Epochs:
-            torch.save(model_eval.state_dict(), os.path.join(save_dir, "ep%03d-loss%.3f-val_loss%.3f.pth" % (epoch + 1, total_loss / epoch_step, val_loss / epoch_step_val)))
+            torch.save(model.state_dict(), os.path.join(save_dir, "ep%03d-loss%.3f-val_loss%.3f.pth" % (epoch + 1, total_loss / epoch_step, val_loss / epoch_step_val)))
         if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
             print('Save best model to best_epoch_weights.pth')
-            torch.save(model_eval.state_dict(), os.path.join(save_dir, "best_epoch_weights.pth"))
-        torch.save(model_eval.state_dict(), os.path.join(save_dir, "last_epoch_weights.pth"))
+            torch.save(model.state_dict(), os.path.join(save_dir, "best_epoch_weights.pth"))
+        torch.save(model.state_dict(), os.path.join(save_dir, "last_epoch_weights.pth"))
         
             
                 
