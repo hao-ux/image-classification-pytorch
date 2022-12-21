@@ -22,9 +22,9 @@
             - flower1
             - ...
     ```
-    运行`python process_datasets_path.py`命令，将会生成train_cls.txt和valid_cls.txt，这是训练时所需要的。
+    运行`python process_datasets_path.py`命令，将会生成`train_cls.txt`和`valid_cls.txt`，这是训练时所需要的。
 
-2. 训练的参数配置在train.py中
+2. 训练的参数配置在`train.py`中，预训练权重下载到`weights`文件夹。
     ```python
     config = {
     'is_cuda'                  : True,         
@@ -32,7 +32,7 @@
     'classes_path'             : './classes.txt',   # 种类
     'input_shape'              : [224, 224],        
     'model_name'               : 'mobileone',
-    'pretrained_weights'       : True,             
+    'pretrained_weights'       : True,              # 是否需要预训练权重
     'model_path'               : '',
     'batch_size'               : 16,
     'Epochs'                   : 400,
