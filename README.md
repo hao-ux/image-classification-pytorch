@@ -40,9 +40,9 @@
     'optimizer_type'           : 'SGD',
     'lr_decay_type'            : 'Cosine',
     'num_worker'               : 4,
-    'save_dir'                 : './logs',  # 保存权重以及损失的文件夹
-    'save_period'              : 10,        # 每隔10Epochs保存一次权重
-    'loss_func'                : 'Poly_loss'# 损失函数
+    'save_dir'                 : './logs',          # 保存权重以及损失的文件夹
+    'save_period'              : 10,                # 每隔10Epochs保存一次权重
+    'loss_func'                : 'Poly_loss'        # 损失函数
     }
     ```
 
