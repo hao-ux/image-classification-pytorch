@@ -36,7 +36,7 @@ Code: bhjx
     'fp16'                     : True,              # Mixed precision training  
     'classes_path'             : './classes.txt',   # category
     'input_shape'              : [224, 224],        
-    'model_name'               : 'mobileone',
+    'model_name'               : 'mobileone',       # ghostnetv2, mobileone
     'pretrained_weights'       : True,              # Whether pre-training weights are required重
     'model_path'               : '',                # Weights for the entire model
     'batch_size'               : 16,
