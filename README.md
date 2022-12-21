@@ -95,3 +95,4 @@ python inference.py --model_name mobileone --model_path weights/mobileone-16e-s0
 
 1. https://github.com/bubbliiiing/classification-pytorch
 2. https://github.com/apple/ml-mobileone
+3. https://github.com/huawei-noah/Efficient-AI-Backbones/tree/master/ghostnetv2_pytorch
