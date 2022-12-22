@@ -18,8 +18,6 @@ Flower image classification data set
 Link: https://pan.baidu.com/s/1zs9U76OmGAIwbYr91KQxgg
 Code: bhjx
 
-[An Improved One millisecond Mobile Backbone](https://arxiv.org/pdf/2206.04040.pdf) |
-[GhostNetV2: Enhance Cheap Operation with Long-Range Attention](https://openreview.net/pdf/6db544c65bbd0fa7d7349508454a433c112470e2.pdf) |
 
 1. Dataset file structure
     ```txt
