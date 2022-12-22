@@ -2,18 +2,24 @@
 
 ## Image classification model
 
+### Updating
+- 2022.12.22, the `RandAugment` data augmentation method was added.
+
 ### 1. Training
 
 #### 1.1 Pre-trained weights
 
-| model | link | paper |
-| - | - | - |
-| [mobileone](https://github.com/apple/ml-mobileone) | [s0](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s0_unfused.pth.tar)、[s1](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s1_unfused.pth.tar)、[s2](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s2_unfused.pth.tar)、[s3](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s3_unfused.pth.tar)、[s4](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s4_unfused.pth.tar) | [An Improved One millisecond Mobile Backbone](https://arxiv.org/pdf/2206.04040.pdf) |
-| [ghostnetv2](https://github.com/huawei-noah/Efficient-AI-Backbones/tree/master/ghostnetv2_pytorch) | width：[1.0](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/ck_ghostnetv2_10.pth.tar) | [GhostNetV2: Enhance Cheap Operation with Long-Range Attention](https://openreview.net/pdf/6db544c65bbd0fa7d7349508454a433c112470e2.pdf) |
+| model | link |
+| - | - |
+| [mobileone](https://github.com/apple/ml-mobileone) | [s0](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s0_unfused.pth.tar)、[s1](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s1_unfused.pth.tar)、[s2](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s2_unfused.pth.tar)、[s3](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s3_unfused.pth.tar)、[s4](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s4_unfused.pth.tar) |
+| [ghostnetv2](https://github.com/huawei-noah/Efficient-AI-Backbones/tree/master/ghostnetv2_pytorch) | width：1.0 |
 
 Flower image classification data set
 Link: https://pan.baidu.com/s/1zs9U76OmGAIwbYr91KQxgg
 Code: bhjx
+
+[An Improved One millisecond Mobile Backbone](https://arxiv.org/pdf/2206.04040.pdf) |
+[GhostNetV2: Enhance Cheap Operation with Long-Range Attention](https://openreview.net/pdf/6db544c65bbd0fa7d7349508454a433c112470e2.pdf) |
 
 1. Dataset file structure
     ```txt
@@ -36,7 +42,7 @@ Code: bhjx
     'fp16'                     : True,              # Mixed precision training  
     'classes_path'             : './classes.txt',   # category
     'input_shape'              : [224, 224],        
-    'model_name'               : 'mobileone',       # ghostnetv2, mobileone
+    'model_name'               : 'mobileone',
     'pretrained_weights'       : True,              # Whether pre-training weights are required重
     'model_path'               : '',                # Weights for the entire model
     'batch_size'               : 16,
@@ -95,4 +101,3 @@ This repository only supports onnxruntime deployment for now.
 
 1. https://github.com/bubbliiiing/classification-pytorch
 2. https://github.com/apple/ml-mobileone
-3. https://github.com/huawei-noah/Efficient-AI-Backbones/tree/master/ghostnetv2_pytorch

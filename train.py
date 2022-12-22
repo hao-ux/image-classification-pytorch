@@ -53,6 +53,10 @@ if __name__ == '__main__':
     save_period          = config['save_period']
     loss_func            = config['loss_func']
     Epochs               = config['Epochs']
+    
+    loss_func = {
+        'Poly_loss': Poly1CrossEntropyLoss, 'PolyFocal': Poly1FocalLoss
+    }[loss_func]
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     class_names = get_classes(classes_path)
@@ -98,7 +102,7 @@ if __name__ == '__main__':
     np.random.shuffle(train_lines)
     np.random.seed(None)
     
-    train_dataset   = ClassificationDataset(train_lines, input_shape, phase='train')
+    train_dataset   = ClassificationDataset(train_lines, input_shape, phase='train', is_randaugment=False)
     val_dataset     = ClassificationDataset(val_lines, input_shape, phase='valid')
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, num_workers=num_worker, pin_memory=True, 
                                 drop_last=True, collate_fn=detection_collate)
@@ -143,13 +147,13 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             if not fp16:
                 outputs = model_train(images)
-                loss_value = Poly1CrossEntropyLoss(num_classes=num_classes, reduction='mean')(outputs, targets)
+                loss_value = loss_func(num_classes=num_classes)(outputs, targets)
                 loss_value.backward()
                 optimizer.step()
             else:
                 with autocast():
                     outputs = model_train(images)
-                    loss_value = Poly1CrossEntropyLoss(num_classes=num_classes, reduction='mean')(outputs, targets)
+                    loss_value = loss_func(num_classes=num_classes)(outputs, targets)
                 scaler.scale(loss_value).backward()
                 scaler.step(optimizer)
                 scaler.update()

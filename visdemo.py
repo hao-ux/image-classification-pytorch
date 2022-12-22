@@ -3,6 +3,7 @@ from utils.image_aug import (
     Cutout, RandomHorizontalVerticalFlip, Resize, RandomRotate, RandomBright, RandomContrast,
     RandomSaturation, RandomHue
 )
+from utils.augmentations import RandAugment
 from utils.utils import cvtColor
 from matplotlib import pyplot as plt
 import numpy as np
@@ -11,7 +12,7 @@ import numpy as np
 aug_names = {
     'cutout': Cutout(), 'randomhorizontalverticalflip': RandomHorizontalVerticalFlip(), 'resize': Resize(224),
     'randomrotate': RandomRotate(), 'randomrright': RandomBright(), 'randomcontrast': RandomContrast(), 
-    'randomsaturation': RandomSaturation(), 'randomhue': RandomHue()
+    'randomsaturation': RandomSaturation(), 'randomhue': RandomHue(), 'randaugment': RandAugment(m=0.11)
 }
 
 # ------------------------------------- #
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     img = Image.open('./img/flower4.jpg')
     img = cvtColor(img)
     
-    vis = DataAugVision(['randomhue', 'randomrotate', 'randomhorizontalverticalflip', 'randomsaturation'])
+    vis = DataAugVision('randaugment')
     vis.vision(img)
     
     

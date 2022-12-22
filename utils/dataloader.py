@@ -2,15 +2,17 @@ import torch
 import numpy as np
 from PIL import Image
 
+from utils.augmentations import RandAugment
 from utils.image_aug import Cutout, RandomHorizontalVerticalFlip, Resize, RandomRotate, RandomBright, RandomContrast, RandomSaturation, RandomHue
 from utils.utils import cvtColor, preprocess_input
 
 class ClassificationDataset(torch.utils.data.Dataset):
-    def __init__(self, file_list,input_shape, prob=0.8, phase='train'):
+    def __init__(self, file_list,input_shape, prob=0.8, phase='train', is_randaugment=True):
         self.file_list = file_list
         self.input_shape = input_shape
         self.phase = phase
         self.prob = prob
+        self.is_randaugment = is_randaugment
     
     def __len__(self):
         return len(self.file_list)
@@ -20,7 +22,10 @@ class ClassificationDataset(torch.utils.data.Dataset):
         image = Image.open(file_path)
         image = cvtColor(image)
         if self.phase == 'train':
-            image = self.img_aug(image, self.prob)
+            if self.is_randaugment:
+                image = self.randaugment(image)
+            else:
+                image = self.img_aug(image, self.prob)
         else:
             if isinstance(self.input_shape, (list, tuple)):
                 self.input_shape = self.input_shape[0]
@@ -34,9 +39,19 @@ class ClassificationDataset(torch.utils.data.Dataset):
         if isinstance(self.input_shape, (list, tuple)):
             self.input_shape = self.input_shape[0]
         aug_list = [
-            Cutout(prob=prob), RandomHorizontalVerticalFlip(), Resize(self.input_shape),
+            Cutout(prob=prob), Resize(self.input_shape), RandomHorizontalVerticalFlip(),
             RandomRotate(prob=prob),RandomBright(prob, 0.5), RandomContrast(prob),
             RandomSaturation(prob), RandomHue(prob, 20)
+        ]
+        for aug in aug_list:
+            img = aug(img)
+        return img
+    
+    def randaugment(self, img, n=3, m=9):
+        if isinstance(self.input_shape, (list, tuple)):
+            self.input_shape = self.input_shape[0]
+        aug_list = [
+            Resize(self.input_shape), RandAugment(n, m)
         ]
         for aug in aug_list:
             img = aug(img)
