@@ -7,12 +7,12 @@ from utils.image_aug import Cutout, RandomHorizontalVerticalFlip, Resize, Random
 from utils.utils import cvtColor, preprocess_input
 
 class ClassificationDataset(torch.utils.data.Dataset):
-    def __init__(self, file_list,input_shape, prob=0.8, phase='train', is_randaugment=True):
+    def __init__(self, file_list,input_shape, prob=0.8, phase='train', data_aug='original'):
         self.file_list = file_list
         self.input_shape = input_shape
         self.phase = phase
         self.prob = prob
-        self.is_randaugment = is_randaugment
+        self.data_aug = data_aug
     
     def __len__(self):
         return len(self.file_list)
@@ -22,7 +22,7 @@ class ClassificationDataset(torch.utils.data.Dataset):
         image = Image.open(file_path)
         image = cvtColor(image)
         if self.phase == 'train':
-            if self.is_randaugment:
+            if self.data_aug == 'randaugment':
                 image = self.randaugment(image)
             else:
                 image = self.img_aug(image, self.prob)

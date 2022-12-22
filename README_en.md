@@ -12,7 +12,7 @@
 | model | link |
 | - | - |
 | [mobileone](https://github.com/apple/ml-mobileone) | [s0](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s0_unfused.pth.tar)、[s1](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s1_unfused.pth.tar)、[s2](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s2_unfused.pth.tar)、[s3](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s3_unfused.pth.tar)、[s4](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/mobileone_s4_unfused.pth.tar) |
-| [ghostnetv2](https://github.com/huawei-noah/Efficient-AI-Backbones/tree/master/ghostnetv2_pytorch) | width：1.0 |
+| [ghostnetv2](https://github.com/huawei-noah/Efficient-AI-Backbones/tree/master/ghostnetv2_pytorch) | width：[1.0](https://github.com/hao-ux/image-classification-pytorch/releases/download/weights/ck_ghostnetv2_10.pth.tar) |
 
 Flower image classification data set
 Link: https://pan.baidu.com/s/1zs9U76OmGAIwbYr91KQxgg
@@ -38,23 +38,36 @@ Code: bhjx
 2. The training parameters are configured in `train.py`, and the pre-trained weights are downloaded to the `weights`folder.
     ```python
     config = {
-    'is_cuda'                  : True,         
-    'fp16'                     : True,              # Mixed precision training  
-    'classes_path'             : './classes.txt',   # category
-    'input_shape'              : [224, 224],        
-    'model_name'               : 'mobileone',
-    'pretrained_weights'       : True,              # Whether pre-training weights are required重
-    'model_path'               : '',                # Weights for the entire model
-    'batch_size'               : 16,
-    'Epochs'                   : 400,
-    'learning_rate'            : 1e-2,
-    'optimizer_type'           : 'SGD',
-    'lr_decay_type'            : 'Cosine',
-    'num_worker'               : 4,
-    'save_dir'                 : './logs',          # Save the weights and loss的文件夹
-    'save_period'              : 10,                # The weights are saved every 10 epochs
-    'loss_func'                : 'Poly_loss'        # loss function
+        'is_cuda'                  : True,         
+        'fp16'                     : True,              # Mixed precision training  
+        'classes_path'             : './classes.txt',   # category
+        'input_shape'              : [224, 224],        
+        'model_name'               : 'mobileone',
+        'pretrained_weights'       : False,              # Whether pre-trained weights are required
+        'model_path'               : '',                # Whether we need to pre-train weights Weights for the entire model
+        'batch_size'               : 16,
+        'Epochs'                   : 400,
+        'learning_rate'            : 1e-2,
+        'optimizer_type'           : 'SGD',
+        'lr_decay_type'            : 'Cosine',
+        'num_worker'               : 4,
+        'save_dir'                 : './logs',          # Folder to save weights and losses
+        'save_period'              : 10,                # The weights are saved every 10 epochs
+        'loss_func_name'           : 'Poly_loss',        # loss function
+        'data_aug'                 : 'original'
     }
+
+    # ---------------------------------------------------- #
+    # model_name                 optional：mobileone、ghostnetv2
+    # optimizer_type             optional：SGD、Adam、Ranger
+    # loss_func_name
+    # optional：Poly_loss、PolyFocal、CE、LabelSmoothSoftmaxCE
+    # If it is a double loss function, then 'loss_func_name' is set to a list
+    # like：'loss_func_name': [('Poly_loss', 'LabelSmoothSoftmaxCE'), (0.9, 0.1)]
+    # The last tuple is the weight of the corresponding loss function
+    # data_aug                   optional：original、randaugment
+    # lr_decay_type              optional：Cosine
+    # ---------------------------------------------------- #
     ```
 
     Network structure parameters of mobileone , run:

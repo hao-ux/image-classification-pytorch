@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
+from torch.nn.modules.loss import _Loss
 
 
 class Poly1CrossEntropyLoss(nn.Module):
@@ -124,3 +125,62 @@ class Poly1FocalLoss(nn.Module):
             poly1 = poly1.sum()
 
         return poly1
+
+class LabelSmoothSoftmaxCE(nn.Module):
+    def __init__(self,
+                 lb_pos=0.9,
+                 lb_neg=0.005,
+                 reduction='mean',
+                 lb_ignore=255,
+                 ):
+        super(LabelSmoothSoftmaxCE, self).__init__()
+        self.lb_pos = lb_pos
+        self.lb_neg = lb_neg
+        self.reduction = reduction
+        self.lb_ignore = lb_ignore
+        self.log_softmax = nn.LogSoftmax(1)
+
+    def forward(self, logits, label):
+        logs = self.log_softmax(logits)
+        ignore = label.data.cpu() == self.lb_ignore
+        n_valid = (ignore == 0).sum()
+        label = label.clone()
+        label[ignore] = 0
+        lb_one_hot = logits.data.clone().zero_().scatter_(1, label.unsqueeze(1), 1)
+        label = self.lb_pos * lb_one_hot + self.lb_neg * (1-lb_one_hot)
+        ignore = ignore.nonzero()
+        _, M = ignore.size()
+        a, *b = ignore.chunk(M, dim=1)
+        label[[a, torch.arange(label.size(1)), *b]] = 0
+
+        if self.reduction == 'mean':
+            loss = -torch.sum(torch.sum(logs*label, dim=1)) / n_valid
+        elif self.reduction == 'none':
+            loss = -torch.sum(logs*label, dim=1)
+        return loss
+
+class WeightedLoss(_Loss):
+    """Wrapper class around loss function that applies weighted with fixed factor.
+    This class helps to balance multiple losses if they have different scales
+    """
+
+    def __init__(self, loss, weight=1.0):
+        super().__init__()
+        self.loss = loss
+        self.weight = weight
+
+    def forward(self, *input):
+        return self.loss(*input) * self.weight
+    
+class JointLoss(_Loss):
+    """
+    Wrap two loss functions into one. This class computes a weighted sum of two losses.
+    """
+
+    def __init__(self, first: nn.Module, second: nn.Module, first_weight=1.0, second_weight=1.0):
+        super().__init__()
+        self.first = WeightedLoss(first, first_weight)
+        self.second = WeightedLoss(second, second_weight)
+
+    def forward(self, *input):
+        return self.first(*input) + self.second(*input)

@@ -5,35 +5,53 @@ from torch.cuda.amp import autocast
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
+import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from tqdm import tqdm
 
 from utils.dataloader import ClassificationDataset, detection_collate
 from utils.utils import get_classes, weights_init, show_config
-from utils.loss import Poly1CrossEntropyLoss, Poly1FocalLoss
+from utils.loss import (
+    Poly1CrossEntropyLoss, Poly1FocalLoss, LabelSmoothSoftmaxCE, JointLoss
+)
 from nets import get_model_from_name
 from utils.callbacks import LossHistory
 from nets.mobileone import reparameterize_model
+from utils.optimizer import Ranger
 
 config = {
     'is_cuda'                  : True,         
-    'fp16'                     : True,              
-    'classes_path'             : './classes.txt',   
+    'fp16'                     : True,              # 混合精度训练  
+    'classes_path'             : './classes.txt',   # 种类
     'input_shape'              : [224, 224],        
-    'model_name'               : 'ghostnetv2',
-    'pretrained_weights'       : True,             
-    'model_path'               : '',
+    'model_name'               : 'mobileone',
+    'pretrained_weights'       : False,              # 是否需要预训练权重
+    'model_path'               : '',                # 整个模型的权重
     'batch_size'               : 16,
     'Epochs'                   : 400,
     'learning_rate'            : 1e-2,
     'optimizer_type'           : 'SGD',
     'lr_decay_type'            : 'Cosine',
     'num_worker'               : 4,
-    'save_dir'                 : './logs',
-    'save_period'              : 10,
-    'loss_func'                : 'Poly_loss'
+    'save_dir'                 : './logs',          # 保存权重以及损失的文件夹
+    'save_period'              : 10,                # 每隔10Epochs保存一次权重
+    'loss_func_name'           : 'Poly_loss',        # 损失函数
+    'data_aug'                 : 'original'
 }
+
+# ---------------------------------------------------- #
+# model_name                 可选：mobileone、ghostnetv2
+# optimizer_type             可选：SGD、Adam、Ranger
+# loss_func_name
+# 可选：Poly_loss、PolyFocal、CE、LabelSmoothSoftmaxCE
+# 若设置为是双损失函数，则'loss_func_name'设成列表形式
+# 如：'loss_func_name': [('Poly_loss', 'LabelSmoothSoftmaxCE'), (0.9, 0.1)]
+# 后面一个元组为对应损失函数的权重
+# data_aug                   可选：original、randaugment
+# lr_decay_type              可选：Cosine
+# ---------------------------------------------------- #
+
 
 if __name__ == '__main__':
     
@@ -51,16 +69,25 @@ if __name__ == '__main__':
     num_worker           = config['num_worker']
     save_dir             = config['save_dir']
     save_period          = config['save_period']
-    loss_func            = config['loss_func']
+    loss_func_name       = config['loss_func_name']
     Epochs               = config['Epochs']
+    data_aug             = config['data_aug']
     
-    loss_func = {
-        'Poly_loss': Poly1CrossEntropyLoss, 'PolyFocal': Poly1FocalLoss
-    }[loss_func]
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     class_names = get_classes(classes_path)
     num_classes = len(class_names)
+    loss_func_dict = {
+            'Poly_loss': Poly1CrossEntropyLoss(num_classes), 'PolyFocal': Poly1FocalLoss(num_classes),
+            'CE': nn.CrossEntropyLoss(),
+            'LabelSmoothSoftmaxCE': LabelSmoothSoftmaxCE()
+        }
+    if isinstance(loss_func_name, str):
+        loss_func = loss_func_dict[loss_func_name]
+    else:
+        first_loss, first_loss_weight = loss_func_dict[loss_func_name[0][0]], loss_func_name[1][0]
+        second_loss, second_loss_weight = loss_func_dict[loss_func_name[0][1]], loss_func_name[1][1]
+        loss_func = JointLoss(first_loss, second_loss, first_loss_weight, second_loss_weight)
     if model_name in ['mobileone']:
         model = get_model_from_name[model_name](num_classes=num_classes, variant="s0", pretrained=pretrained_weights, inference_mode=False)
     else:
@@ -102,7 +129,7 @@ if __name__ == '__main__':
     np.random.shuffle(train_lines)
     np.random.seed(None)
     
-    train_dataset   = ClassificationDataset(train_lines, input_shape, phase='train', is_randaugment=False)
+    train_dataset   = ClassificationDataset(train_lines, input_shape, phase='train', data_aug=data_aug)
     val_dataset     = ClassificationDataset(val_lines, input_shape, phase='valid')
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, num_workers=num_worker, pin_memory=True, 
                                 drop_last=True, collate_fn=detection_collate)
@@ -119,7 +146,8 @@ if __name__ == '__main__':
         print("\033[1;33;44m[Warning] 由于总训练步长为%d，小于建议总步长%d，建议设置总世代为%d。\033[0m"%(total_step, wanted_step, wanted_epoch))
     optimizer = {
             'Adam'  : optim.Adam(model_train.parameters(), learning_rate, betas = (0.9, 0.999), weight_decay=5e-4),
-            'SGD'   : optim.SGD(model_train.parameters(), learning_rate, momentum = 0.9, nesterov=True)
+            'SGD'   : optim.SGD(model_train.parameters(), learning_rate, momentum = 0.9, nesterov=True),
+            'Ranger': Ranger(model_train.parameters(), learning_rate)
         }[optimizer_type]
     scheduler =  torch.optim.lr_scheduler.CosineAnnealingLR(optimizer = optimizer,T_max =  Epochs)
     epoch_step      = num_train // batch_size
@@ -147,13 +175,13 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             if not fp16:
                 outputs = model_train(images)
-                loss_value = loss_func(num_classes=num_classes)(outputs, targets)
+                loss_value = loss_func(outputs, targets)
                 loss_value.backward()
                 optimizer.step()
             else:
                 with autocast():
                     outputs = model_train(images)
-                    loss_value = loss_func(num_classes=num_classes)(outputs, targets)
+                    loss_value = loss_func(outputs, targets)
                 scaler.scale(loss_value).backward()
                 scaler.step(optimizer)
                 scaler.update()
@@ -185,7 +213,7 @@ if __name__ == '__main__':
 
                 optimizer.zero_grad()
                 outputs = model_eval(images)
-                loss_value  = Poly1CrossEntropyLoss(num_classes=num_classes, reduction='mean')(outputs, targets)
+                loss_value = loss_func(outputs, targets)
                 val_loss    += loss_value.item()
                 accuracy        = torch.mean((torch.argmax(F.softmax(outputs, dim=-1), dim=-1) == targets).type(torch.FloatTensor))
                 val_accuracy    += accuracy.item()
