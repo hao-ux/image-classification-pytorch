@@ -33,7 +33,7 @@ Code: bhjx
     ```
     Running`python process_datasets_path.py` will generate `train_cls.txt` and `valid_cls.txt`, which are needed for training.
 
-2. The training parameters are configured in `train.py`, and the pre-trained weights are downloaded to the `weights`folder.
+2. The training parameters are configured in `train.py`, **Notice: the pre-trained weights are downloaded to the `weights`folder.**
     ```python
     config = {
         'is_cuda'                  : True,         
@@ -54,7 +54,7 @@ Code: bhjx
         'loss_func_name'           : 'Poly_loss',        # loss function
         'data_aug'                 : 'original'
     }
-
+    
     # ---------------------------------------------------- #
     # model_name                 optional：mobileone、ghostnetv2
     # optimizer_type             optional：SGD、Adam、Ranger

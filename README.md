@@ -33,7 +33,7 @@
     ```
     运行`python process_datasets_path.py`命令，将会生成`train_cls.txt`和`valid_cls.txt`，这是训练时所需要的。
 
-2. 训练的参数配置在`train.py`中，预训练权重下载到`weights`文件夹。
+2. 训练的参数配置在`train.py`中，**注意：预训练权重下载到`weights`文件夹**。
     ```python
     config = {
         'is_cuda'                  : True,         
@@ -54,7 +54,7 @@
         'loss_func_name'           : 'Poly_loss',        # 损失函数
         'data_aug'                 : 'original'
     }
-
+    
     # ---------------------------------------------------- #
     # model_name                 可选：mobileone、ghostnetv2
     # optimizer_type             可选：SGD、Adam、Ranger
